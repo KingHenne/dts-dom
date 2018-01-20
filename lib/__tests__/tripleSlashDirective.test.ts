@@ -1,18 +1,17 @@
-import {ContextFlags, TripleSlashDirective, create, emit} from "../index"
+import {ContextFlags, TopLevelDeclaration, create, emit} from "../index"
 
 describe("an emitted module with triple slash directives", () => {
     it("matches the snapshot", () => {
-        const tripleSlashDirectives: TripleSlashDirective[] = [];
+        const declarations: TopLevelDeclaration[] = [];
 
-        tripleSlashDirectives.push(create.tripleSlashReferencePathDirective("./test"));
-        tripleSlashDirectives.push(create.tripleSlashReferenceTypesDirective("test"));
-        tripleSlashDirectives.push(create.tripleSlashReferenceNoDefaultLibDirective());
-        tripleSlashDirectives.push(create.tripleSlashAmdModuleDirective());
-        tripleSlashDirectives.push(create.tripleSlashAmdModuleDirective("test"));
+        declarations.push(create.tripleSlashReferencePathDirective("./test"));
+        declarations.push(create.tripleSlashReferenceTypesDirective("test"));
+        declarations.push(create.tripleSlashReferenceNoDefaultLibDirective());
+        declarations.push(create.tripleSlashAmdModuleDirective());
+        declarations.push(create.tripleSlashAmdModuleDirective("test"));
+        declarations.push(create.module("test"));
 
-        const module = create.module("test");
-
-        expect(emit(module, ContextFlags.Module, tripleSlashDirectives)).toMatchSnapshot();
+        expect(emit(declarations, ContextFlags.Module)).toMatchSnapshot();
     });
 });
 

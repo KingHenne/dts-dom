@@ -243,7 +243,7 @@ export type Import = ImportAllDeclaration | ImportDefaultDeclaration | ImportNam
 
 export type NamespaceMember = InterfaceDeclaration | TypeAliasDeclaration | ClassDeclaration | NamespaceDeclaration | ConstDeclaration | VariableDeclaration | FunctionDeclaration;
 export type ModuleMember = InterfaceDeclaration | TypeAliasDeclaration | ClassDeclaration | NamespaceDeclaration | ConstDeclaration | VariableDeclaration | FunctionDeclaration | Import;
-export type TopLevelDeclaration =  NamespaceMember | ExportEqualsDeclaration | ExportNameDeclaration | ModuleDeclaration | EnumDeclaration | Import;
+export type TopLevelDeclaration = TripleSlashDirective | NamespaceMember | ExportEqualsDeclaration | ExportNameDeclaration | ModuleDeclaration | EnumDeclaration | Import;
 
 export enum DeclarationFlags {
     None = 0,
@@ -597,14 +597,13 @@ export function never(x: never, err: string): never {
     throw new Error(err);
 }
 
-export function emit(rootDecl: TopLevelDeclaration, rootFlags = ContextFlags.None, tripleSlashDirectives: TripleSlashDirective[] = []): string {
+export function emit(rootDecl: TopLevelDeclaration | TopLevelDeclaration[], rootFlags = ContextFlags.None): string {
     let output = "";
     let indentLevel = 0;
     let contextStack: ContextFlags[] = [rootFlags];
+    let rootDeclarations = Array.isArray(rootDecl) ? rootDecl : Array(rootDecl);
 
-    tripleSlashDirectives.forEach(writeTripleSlashDirective);
-
-    writeDeclaration(rootDecl);
+    rootDeclarations.forEach(writeDeclaration);
     newline();
     return output;
 
@@ -1218,6 +1217,11 @@ export function emit(rootDecl: TopLevelDeclaration, rootFlags = ContextFlags.Non
                     return writeImport(d);
                 case "enum":
                     return writeEnum(d);
+                case "triple-slash-reference-path":
+                case "triple-slash-reference-types":
+                case "triple-slash-reference-no-default-lib":
+                case "triple-slash-amd-module":
+                    return writeTripleSlashDirective(d);
 
                 default:
                     return never(d, `Unknown declaration kind ${(d as TopLevelDeclaration).kind}`);
