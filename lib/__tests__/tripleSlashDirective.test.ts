@@ -11,8 +11,9 @@ describe("an emitted module with triple slash directives", () => {
         tripleSlashDirectives.push(create.tripleSlashAmdModuleDirective("test"));
 
         const module = create.module("test");
+        const emitOptions = {rootFlags: ContextFlags.Module, tripleSlashDirectives};
 
-        expect(emit(module, ContextFlags.Module, tripleSlashDirectives)).toMatchSnapshot();
+        expect(emit(module, emitOptions)).toMatchSnapshot();
     });
 });
 

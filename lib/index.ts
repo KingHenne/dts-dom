@@ -597,10 +597,17 @@ export function never(x: never, err: string): never {
     throw new Error(err);
 }
 
-export function emit(rootDecl: TopLevelDeclaration, rootFlags = ContextFlags.None, tripleSlashDirectives: TripleSlashDirective[] = []): string {
+export interface EmitOptions {
+    rootFlags?: ContextFlags;
+    tripleSlashDirectives?: TripleSlashDirective[];
+}
+
+export function emit(rootDecl: TopLevelDeclaration, options?: ContextFlags | EmitOptions): string {
     let output = "";
     let indentLevel = 0;
-    let contextStack: ContextFlags[] = [rootFlags];
+    const rootFlags = (typeof options === 'object' ? options.rootFlags : options) || ContextFlags.None;
+    const contextStack: ContextFlags[] = [rootFlags];
+    const tripleSlashDirectives = typeof options === 'object' && options.tripleSlashDirectives || [];
 
     tripleSlashDirectives.forEach(writeTripleSlashDirective);
 
